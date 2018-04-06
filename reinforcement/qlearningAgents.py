@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -43,6 +43,7 @@ class QLearningAgent(ReinforcementAgent):
         ReinforcementAgent.__init__(self, **args)
 
         "*** YOUR CODE HERE ***"
+        self.vals = util.Counter()
 
     def getQValue(self, state, action):
         """
@@ -51,8 +52,9 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        if (state,action) not in self.vals:
+            return 0.0
+        return self.vals[(state,action)]
 
     def computeValueFromQValues(self, state):
         """
@@ -62,7 +64,11 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        actions = self.getLegalActions(state)
+        allActions = []
+        for action in actions:
+            allActions.append(self.getQValue(state, action))
+        return max(allActions)
 
     def computeActionFromQValues(self, state):
         """
@@ -102,7 +108,9 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Implement the Q-value transition function....?
+        val = reward + self.discount
+        return val
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
@@ -165,14 +173,14 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.vals[(state, action)]
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # implement the fn??
 
     def final(self, state):
         "Called at the end of each game."
