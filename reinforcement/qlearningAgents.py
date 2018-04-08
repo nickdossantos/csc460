@@ -11,6 +11,9 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+# Nick Dos Santos
+# April 2018
+
 
 from game import *
 from learningAgents import ReinforcementAgent
@@ -53,7 +56,7 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         if (state,action) not in self.vals:
-            return 0.0
+            self.vals[(state, action)] = 0.0
         return self.vals[(state,action)]
 
     def computeValueFromQValues(self, state):
@@ -64,8 +67,11 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
+
         actions = self.getLegalActions(state)
         allActions = []
+        if len(actions) == 0:
+            return 0.0
         for action in actions:
             allActions.append(self.getQValue(state, action))
         return max(allActions)
@@ -77,7 +83,13 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        legalActions = self.getLegalActions(state)
+        if len(legalActions) == 0:
+            return None
+        acts = util.Counter()
+        for action in legalActions:
+            acts[action] = self.getQValue(state, action)
+        return acts.argMax()
 
     def getAction(self, state):
         """
@@ -93,10 +105,13 @@ class QLearningAgent(ReinforcementAgent):
         # Pick Action
         legalActions = self.getLegalActions(state)
         action = None
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if len(legalActions) == 0:
+            return None
 
-        return action
+        if util.flipCoin(self.epsilon):
+            return random.choice(legalActions)
+        else:
+            return self.computeActionFromQValues(state)
 
     def update(self, state, action, nextState, reward):
         """
@@ -107,10 +122,9 @@ class QLearningAgent(ReinforcementAgent):
           NOTE: You should never call this function,
           it will be called on your behalf
         """
-        "*** YOUR CODE HERE ***"
-        # Implement the Q-value transition function....?
-        val = reward + self.discount
-        return val
+        qState = self.getQValue(state, action)
+        sample = reward + self.discount * self.computeValueFromQValues(nextState)
+        self.vals[state, action] = (1 - self.alpha) * qState + self.alpha * sample
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
